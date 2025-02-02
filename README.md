@@ -44,6 +44,7 @@ This notebook integrates **LLaMA 3 (Large Language Model Meta AI)** for **text c
 
 ---
 
+
 ### **Summary of RAG approach (still in planning)**  
 
 I though that we could create a RAG with various embedding models and experiment around with metadata/custom weights to get good retrivals to pass to the LLM classification. We can approach this from two methods:
