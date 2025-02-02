@@ -1,3 +1,5 @@
+### **All of the notebooks are executed in kaggle**  
+
 ### **Summary of AutoModel.ipynb**  
 This notebook focuses on building a machine learning model using **TensorFlow** and **transformers** for text classification. It starts by installing dependencies such as `transformers`, `tensorflow`, and `nltk`. It imports various NLP-related libraries and datasets, including the **Supreme Court dataset** from `textacy`. The preprocessing pipeline includes **stopword removal, tokenization, and text normalization**. The model architecture utilizes **BERT embeddings** with dense layers for classification. The notebook includes performance evaluation using **confusion matrices, F1 scores, and classification reports**. The workflow follows a structured **train-test split**, and results are visualized using `matplotlib`.
 
@@ -58,3 +60,5 @@ I though that we could create a RAG with various embedding models and experiment
    - We can ask the model's reasoning ability to highlight which phrases/words cause the classification using RAG.
    - Take those phrases/words and apply techniques to identify the relation of the phrases/words and create a model on it.
    - Then use this model to observe its accuracy. Sort of like a train-test scenario.
+
+
