@@ -1,6 +1,9 @@
 ### **All of the notebooks are executed in kaggle**  
 
 ### **Summary of AutoModel.ipynb**  
+
+Dataset used: https://www.kaggle.com/datasets/dhruvjoshi892/labels-web-of-law/
+
 This notebook focuses on building a machine learning model using **TensorFlow** and **transformers** for text classification. It starts by installing dependencies such as `transformers`, `tensorflow`, and `nltk`. It imports various NLP-related libraries and datasets, including the **Supreme Court dataset** from `textacy`. The preprocessing pipeline includes **stopword removal, tokenization, and text normalization**. The model architecture utilizes **BERT embeddings** with dense layers for classification. The notebook includes performance evaluation using **confusion matrices, F1 scores, and classification reports**. The workflow follows a structured **train-test split**, and results are visualized using `matplotlib`.
 
 This notebook utilizes **BERT (Bidirectional Encoder Representations from Transformers)** for **text classification**. The model is implemented using **TensorFlow and Keras**. 
