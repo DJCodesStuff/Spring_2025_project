@@ -2,10 +2,6 @@
 #SBATCH --job-name=First_test_dj17292n                # Job name
 #SBATCH --output=output.log               # Standard output and error log
 #SBATCH --error=error.log                 # Separate error log
-#SBATCH --nodes=1                         # Number of nodes
-#SBATCH --ntasks=1                        # Number of tasks (processes)
-#SBATCH --cpus-per-task=1                 # Number of CPU cores per task
-#SBATCH --mem=16G                          # Memory per node
 #SBATCH --mail-user=dj17292n@pace.edu # Email notifications
 #SBATCH --mail-type=ALL                    # Notify on job start, end, fail
 
