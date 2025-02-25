@@ -52,10 +52,27 @@ def tokenize_text(texts, max_length=512):
 
 # Load dataset from CSV
 # df = pd.read_csv("/kaggle/input/labels-web-of-law/15_labels_data.csv")  # Adjust file path if needed
-df = pd.read_csv("archive/15_labels_data.csv")  # Adjust file path if needed
+# df = pd.read_csv("archive/15_labels_data.csv")  # Adjust file path if needed
+
+import kagglehub
+from kagglehub import KaggleDatasetAdapter
+
+file_path = "15_labels_data.csv"
+
+# Load the latest version
+df = kagglehub.load_dataset(
+  KaggleDatasetAdapter.PANDAS,
+  "dhruvjoshi892/labels-web-of-law",
+  file_path,
+  # Provide any additional arguments like 
+  # sql_query or pandas_kwargs. See the 
+  # documenation for more information:
+  # https://github.com/Kaggle/kagglehub/blob/main/README.md#kaggledatasetadapterpandas
+)
+
 
 # Apply preprocessing
-df = df[:10]
+# df = df[:10]
 df["text"] = df["text"].apply(preprocess_text)
 
 

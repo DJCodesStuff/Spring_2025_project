@@ -1,0 +1,11 @@
+torch
+wandb
+pandas
+transformers
+peft
+datasets
+numpy
+scikit-learn
+ollama
+textacy
+kagglehub
