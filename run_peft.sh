@@ -6,7 +6,6 @@
 #SBATCH --ntasks=1                        # Number of tasks (processes)
 #SBATCH --cpus-per-task=1                 # Number of CPU cores per task
 #SBATCH --mem=16G                          # Memory per node
-#SBATCH --partition=compute               # Partition name
 #SBATCH --mail-user=dj17292n@pace.edu # Email notifications
 #SBATCH --mail-type=ALL                    # Notify on job start, end, fail
 
