@@ -1,4 +1,4 @@
-numpy
+numpy==1.24.4
 pandas
 torch
 wandb
@@ -9,3 +9,10 @@ scikit-learn
 ollama
 textacy
 kagglehub
+cython
+murmurhash
+cymem
+preshed
+thinc
+blis
+spacy

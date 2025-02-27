@@ -11,3 +11,4 @@ Documentation.txt
 werk
 wandb
 try_slurm.sh
+run_peft.sh
