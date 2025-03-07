@@ -2,7 +2,7 @@
 
 # List of packages to install
 packages=(
-    "numpy==1.24.4"
+    "numpy>=2.0.0,<3.0.0"
     "pandas"
     "torch"
     "wandb"
