@@ -20,7 +20,7 @@ packages=(
     "thinc"
     "blis"
     "spacy"
-    "sklearn"
+    "scikit-learn"
 )
 
 # Loop through each package and install it

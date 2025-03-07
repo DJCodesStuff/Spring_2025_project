@@ -16,4 +16,4 @@ preshed
 thinc
 blis
 spacy
-sklearn
+scikit-learn
