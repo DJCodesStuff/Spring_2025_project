@@ -16,3 +16,4 @@ preshed
 thinc
 blis
 spacy
+sklearn
