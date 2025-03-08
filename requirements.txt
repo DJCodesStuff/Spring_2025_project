@@ -1,6 +1,7 @@
 numpy>2.0.0
 pandas
 torch
+pytorch==1.7.1
 wandb
 transformers
 peft
