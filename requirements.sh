@@ -26,7 +26,7 @@ packages=(
 # Loop through each package and install it
 for package in "${packages[@]}"; do
     echo "Installing $package..."
-    python3 -m pip install "$package"
+    pip install --no-cache-dir --force-reinstall "$package"
 done
 
 echo "All packages installed!"
