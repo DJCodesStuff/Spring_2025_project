@@ -1,7 +1,6 @@
 numpy>2.0.0
 pandas
 torch
-pytorch
 wandb
 transformers
 peft
