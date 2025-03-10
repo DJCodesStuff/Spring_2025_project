@@ -11,8 +11,15 @@ from peft import LoraConfig, get_peft_model, TaskType
 from datasets import Dataset
 import numpy as np
 import re
+import random
 from sklearn.metrics import precision_score, f1_score, recall_score, accuracy_score, balanced_accuracy_score
 from sklearn.model_selection import train_test_split
+
+random.seed(42)
+np.random.seed(42)
+
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(42)
 
 # Ensure GPU availability
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -129,14 +136,13 @@ model.print_trainable_parameters()
 
 # Define metrics
 def compute_metrics(eval_pred):
-    print("compute_metrics function called!")  # Debugging statement
 
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=1)
 
-    print(f"Logits shape: {logits.shape}, Labels shape: {labels.shape}")  # Debug shape info
-    print(f"Unique predicted labels: {np.unique(preds)}")  # Debugging predictions
-    print(f"Unique actual labels: {np.unique(labels)}")  # Debugging actual labels
+    # print(f"Logits shape: {logits.shape}, Labels shape: {labels.shape}")  # Debug shape info
+    # print(f"Unique predicted labels: {np.unique(preds)}")  # Debugging predictions
+    # print(f"Unique actual labels: {np.unique(labels)}")  # Debugging actual labels
 
     accuracy = accuracy_score(labels, preds)
     balanced_acc = balanced_accuracy_score(labels, preds)  # Adjust for imbalanced labels
@@ -146,7 +152,6 @@ def compute_metrics(eval_pred):
 
     metrics = {
         "accuracy": accuracy,
-        "balanced_accuracy": balanced_acc,
         "precision": precision,
         "recall": recall,
         "f1": f1
@@ -170,7 +175,7 @@ training_args = TrainingArguments(
     learning_rate=3e-5,  # Reduce LR for better fine-tuning
     warmup_ratio=0.1,  # Stabilize early training
     weight_decay=0.01,
-    metric_for_best_model="balanced_accuracy",  # Handle imbalanced classes
+    metric_for_best_model="accuracy",  # Handle imbalanced classes
     load_best_model_at_end=True,
     report_to=["wandb"],  # Enable W&B logging
     fp16=torch.cuda.is_available(),  # Use FP16 if GPU is available
