@@ -72,7 +72,7 @@ df = kagglehub.load_dataset(
 
 
 # Apply preprocessing
-# df = df[:10]
+df = df[:10]
 df["text"] = df["text"].apply(preprocess_text)
 
 
@@ -192,4 +192,5 @@ trainer.train()
 wandb.finish()
 
 results = trainer.evaluate()
-print(results)
+print("For 15 label classification:"+results)
+
