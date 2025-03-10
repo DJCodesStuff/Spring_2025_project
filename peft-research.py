@@ -136,27 +136,20 @@ model.print_trainable_parameters()
 
 # Define metrics
 def compute_metrics(eval_pred):
-
     logits, labels = eval_pred
-    preds = np.argmax(logits, axis=1)
-
-    # print(f"Logits shape: {logits.shape}, Labels shape: {labels.shape}")  # Debug shape info
-    # print(f"Unique predicted labels: {np.unique(preds)}")  # Debugging predictions
-    # print(f"Unique actual labels: {np.unique(labels)}")  # Debugging actual labels
-
-    accuracy = accuracy_score(labels, preds)
-    balanced_acc = balanced_accuracy_score(labels, preds)  # Adjust for imbalanced labels
-    precision = precision_score(labels, preds, average='weighted')
-    recall = recall_score(labels, preds, average='weighted')
-    f1 = f1_score(labels, preds, average='weighted')
-
-    metrics = {
+    predictions = np.argmax(logits, axis=1)
+    accuracy = accuracy_score(labels, predictions)
+    balanced_acc = balanced_accuracy_score(labels, predictions)
+    precision = precision_score(labels, predictions, average='weighted', zero_division=0)
+    recall = recall_score(labels, predictions, average='weighted', zero_division=0)
+    f1 = f1_score(labels, predictions, average='weighted', zero_division=0)
+    return {
         "accuracy": accuracy,
+        "balanced_accuracy": balanced_acc,
         "precision": precision,
         "recall": recall,
         "f1": f1
     }
-    print(f"Metrics computed: {metrics}")  # Debugging computed metrics
 
     return metrics
 
