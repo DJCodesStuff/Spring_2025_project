@@ -143,7 +143,7 @@ def compute_metrics(eval_pred):
     recall = recall_score(labels, predictions, average='weighted', zero_division=0)
     f1 = f1_score(labels, predictions, average='weighted', zero_division=0)
     return {
-        "accuracy": accuracy,
+        "eval_accuracy": accuracy,
         "precision": precision,
         "recall": recall,
         "f1": f1
