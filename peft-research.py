@@ -139,13 +139,11 @@ def compute_metrics(eval_pred):
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=1)
     accuracy = accuracy_score(labels, predictions)
-    balanced_acc = balanced_accuracy_score(labels, predictions)
     precision = precision_score(labels, predictions, average='weighted', zero_division=0)
     recall = recall_score(labels, predictions, average='weighted', zero_division=0)
     f1 = f1_score(labels, predictions, average='weighted', zero_division=0)
     return {
         "accuracy": accuracy,
-        "balanced_accuracy": balanced_acc,
         "precision": precision,
         "recall": recall,
         "f1": f1
@@ -168,7 +166,7 @@ training_args = TrainingArguments(
     learning_rate=3e-5,  # Reduce LR for better fine-tuning
     warmup_ratio=0.1,  # Stabilize early training
     weight_decay=0.01,
-    # metric_for_best_model="epoch",  # Handle imbalanced classes
+    metric_for_best_model="accuracy",  # Handle imbalanced classes
     load_best_model_at_end=True,
     report_to=["wandb"],  # Enable W&B logging
     fp16=torch.cuda.is_available(),  # Use FP16 if GPU is available
@@ -180,7 +178,7 @@ trainer = Trainer(
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=eval_dataset,
-    # compute_metrics=compute_metrics
+    compute_metrics=compute_metrics
 )
 
 # Start training
