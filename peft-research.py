@@ -72,7 +72,7 @@ df = kagglehub.load_dataset(
 
 
 # Apply preprocessing
-# df = df[:10]
+df = df[:10]
 df["text"] = df["text"].apply(preprocess_text)
 
 
