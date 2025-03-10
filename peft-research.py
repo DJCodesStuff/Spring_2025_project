@@ -168,6 +168,7 @@ training_args = TrainingArguments(
     learning_rate=3e-5,  # Reduce LR for better fine-tuning
     warmup_ratio=0.1,  # Stabilize early training
     weight_decay=0.01,
+    metric_for_best_model="epoch",  # Handle imbalanced classes
     load_best_model_at_end=True,
     report_to=["wandb"],  # Enable W&B logging
     fp16=torch.cuda.is_available(),  # Use FP16 if GPU is available
