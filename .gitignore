@@ -8,6 +8,7 @@ dbert_model
 archive (1).zip
 sections.txt
 Documentation.txt
+peft.py
 werk
 wandb
 try_slurm.sh
