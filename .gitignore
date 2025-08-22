@@ -15,3 +15,5 @@ try_slurm.sh
 run_peft.sh
 llama_prompt.csv
 classified_rag_llama.csv
+llama_prompt.csv
+classified_rag_llama.csv
