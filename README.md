@@ -69,32 +69,35 @@ I though that we could create a RAG with various embedding models and experiment
 
 ### **Summary of classification_diffusion_trial.ipynb**
 
-This notebook implements a **diffusion-based text classification model** that combines **denoising diffusion probabilistic models (DDPM)** with traditional classification. The approach uses a frozen BERT encoder with trainable diffusion heads for legal text classification.
+This notebook implements a diffusion-driven text classification model that combines denoising diffusion probabilistic models (DDPMs) with a standard classifier. The approach leverages a frozen BERT encoder for text embeddings, and adds trainable diffusion and classification heads to improve robustness — applied here to legal text classification.
 
-**Key Components:**
+🔑 Key Components
 
-1. **Diffusion Framework**
-   - Implements DDPM schedule with 1000 timesteps
-   - Uses sinusoidal time embeddings for diffusion process
-   - Adds controlled noise to BERT sentence embeddings during training
+- Diffusion Framework
+   Implements a DDPM schedule with 1000 timesteps
+   Uses sinusoidal time embeddings to encode diffusion steps
+   Adds controlled Gaussian noise to BERT sentence embeddings during training
 
-2. **Model Architecture**
-   - **Frozen BERT Encoder**: Extracts sentence embeddings (768-dim)
-   - **Denoiser MLP**: Predicts noise from noisy embeddings and time steps
-   - **Classifier Head**: Uses denoiser features for final classification
-   - **Multi-task Learning**: Combines denoising loss (MSE) and classification loss (CrossEntropy)
+- Model Architecture
+   Frozen BERT Encoder → extracts 768-dimensional sentence embeddings
+   Denoiser MLP → predicts added noise and produces hidden features
+   Classifier Head → maps hidden features to label logits
+   Multi-task Learning → combines
+      Denoising loss (MSE)
+      Classification loss (CrossEntropy)
 
-3. **Training Process**
-   - Random timestep sampling for each batch
-   - Noise addition to clean embeddings using diffusion schedule
-   - Joint optimization of denoising and classification objectives
-   - Uses cosine learning rate scheduling with warmup
+- Training Process
+   Samples a random diffusion timestep for each batch
+   Corrupts embeddings with schedule-based noise
+   Optimizes both denoising and classification objectives jointly
+   Uses cosine LR scheduling with warmup
 
-4. **Inference**
-   - Extracts features at mid-timestep (t=0.6) without noise
-   - Evaluates using macro F1-score and accuracy
-   - Provides prediction function for new texts
-
-**Innovation**: This approach explores whether diffusion models can improve text classification by learning robust representations through the denoising process, potentially capturing better semantic features for legal text classification tasks.
+- Inference & Evaluation
+   Runs embeddings through the model at a fixed mid-timestep (t=0.6) without extra noise
+   Evaluates using macro F1-score and accuracy
+   Includes a predict_texts() function for inference on raw inputs
+   
+✨ Why Diffusion for Classification?
+The innovation here is exploring whether diffusion-style denoising can act as a regularizer, forcing the classifier to learn more robust semantic representations. This is especially promising for legal text, where noise-tolerant embeddings may help capture subtle distinctions.
 
 
