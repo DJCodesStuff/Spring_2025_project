@@ -65,3 +65,36 @@ I though that we could create a RAG with various embedding models and experiment
    - Then use this model to observe its accuracy. Sort of like a train-test scenario.
 
 
+---
+
+### **Summary of classification_diffusion_trial.ipynb**
+
+This notebook implements a **diffusion-based text classification model** that combines **denoising diffusion probabilistic models (DDPM)** with traditional classification. The approach uses a frozen BERT encoder with trainable diffusion heads for legal text classification.
+
+**Key Components:**
+
+1. **Diffusion Framework**
+   - Implements DDPM schedule with 1000 timesteps
+   - Uses sinusoidal time embeddings for diffusion process
+   - Adds controlled noise to BERT sentence embeddings during training
+
+2. **Model Architecture**
+   - **Frozen BERT Encoder**: Extracts sentence embeddings (768-dim)
+   - **Denoiser MLP**: Predicts noise from noisy embeddings and time steps
+   - **Classifier Head**: Uses denoiser features for final classification
+   - **Multi-task Learning**: Combines denoising loss (MSE) and classification loss (CrossEntropy)
+
+3. **Training Process**
+   - Random timestep sampling for each batch
+   - Noise addition to clean embeddings using diffusion schedule
+   - Joint optimization of denoising and classification objectives
+   - Uses cosine learning rate scheduling with warmup
+
+4. **Inference**
+   - Extracts features at mid-timestep (t=0.6) without noise
+   - Evaluates using macro F1-score and accuracy
+   - Provides prediction function for new texts
+
+**Innovation**: This approach explores whether diffusion models can improve text classification by learning robust representations through the denoising process, potentially capturing better semantic features for legal text classification tasks.
+
+
