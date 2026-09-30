@@ -19,3 +19,11 @@ llama_prompt.csv
 classified_rag_llama.csv
 llama_prompt.csv
 classified_rag_llama.csv
+
+# Junk
+__pycache__/
+*.pyc
+.DS_Store
+.env
+venv/
+.ipynb_checkpoints/

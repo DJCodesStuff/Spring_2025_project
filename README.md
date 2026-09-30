@@ -1,103 +1,90 @@
-### **All of the notebooks are executed in kaggle**  
+# Supreme Court Case Classification with LLMs
 
-### **Summary of AutoModel.ipynb**  
+Research notebooks that benchmark fine-tuned encoders, LLM prompting and retrieval-augmented generation for classifying U.S. Supreme Court cases by legal issue.
 
-Dataset used: https://www.kaggle.com/datasets/dhruvjoshi892/labels-web-of-law/
+This is the experiment code behind the paper **"Large-Language Memorization During the Classification of United States Supreme Court Cases"** ([arXiv:2512.13654](https://arxiv.org/abs/2512.13654), DOI [10.48550/arXiv.2512.13654](https://doi.org/10.48550/arXiv.2512.13654)).
 
-This notebook focuses on building a machine learning model using **TensorFlow** and **transformers** for text classification. It starts by installing dependencies such as `transformers`, `tensorflow`, and `nltk`. It imports various NLP-related libraries and datasets, including the **Supreme Court dataset** from `textacy`. The preprocessing pipeline includes **stopword removal, tokenization, and text normalization**. The model architecture utilizes **BERT embeddings** with dense layers for classification. The notebook includes performance evaluation using **confusion matrices, F1 scores, and classification reports**. The workflow follows a structured **train-test split**, and results are visualized using `matplotlib`.
+## Overview
 
-This notebook utilizes **BERT (Bidirectional Encoder Representations from Transformers)** for **text classification**. The model is implemented using **TensorFlow and Keras**. 
+Supreme Court opinions are long, and the Supreme Court Database (SCDB) issue taxonomy is fine-grained, so assigning each case its legal issue is hard to automate. The project compares several ways of doing it at two levels of granularity: **15 broad issue areas** and **279 specific issues**. The approaches include fine-tuning encoders (BERT, Legal-BERT) with and without LoRA adapters, zero-shot prompting of LLaMA 3 through Ollama, and a RAG pipeline that retrieves similar cases before asking the LLM.
 
-1. **BERT Tokenization & Embedding**  
-   - The notebook imports `BertTokenizer` and `TFBertModel` from `transformers`.  
-   - Text is tokenized using **BERT Tokenizer**, converting text into numerical format for model processing.  
-   - `TFBertModel` is used to extract contextual word embeddings.
+## What's inside
 
-2. **Neural Network Architecture**  
-   - **Input Layer**: Takes tokenized text input.  
-   - **BERT Layer**: A frozen or fine-tuned BERT model for feature extraction.  
-   - **Fully Connected Layers**:  
-     - **Dense layers with Batch Normalization & Dropout** are used for classification.  
-     - **Activation Function**: `ReLU` is applied in hidden layers.  
-   - **Output Layer**: Uses `Softmax` activation for classification.
+| Approach | Notebooks | Models |
+|---|---|---|
+| Full fine-tuning (`AutoModelForSequenceClassification`) | `automodel-bert`, `automodel-legalbert`, `automodel_llama3` | `bert-base-uncased`, `nlpaueb/legal-bert-base-uncased`, Meta-Llama-3-8B |
+| Parameter-efficient fine-tuning (LoRA, r=16) | `peft-research_BERT_15`, `peft-research-legalbert-15`, `peft_research_BERT_279`, `peft_research_LegalBERT_279` | BERT, Legal-BERT |
+| Prompt-based classification | `classify-llama-prompt`, `classify-llama-prompt-15`, `classify-llama-prompts-279`, `classify-llama-279-full` | LLaMA 3 via Ollama |
+| Retrieval-augmented classification | `rag-research`, `rag-research_15`, `rag-research_279` | `all-MiniLM-L6-v2` embeddings + ChromaDB + LLaMA 3 |
+| Diffusion-regularized classifier (exploratory) | `classification_diffusion_trial` | Frozen BERT + DDPM denoiser + classifier head |
+| Evaluation | `compare-results` | Compares LLM labels against ground truth |
 
-3. **Evaluation Metrics**  
-   - The model is trained with `Categorical Crossentropy` loss and optimized using `Adam`.  
-   - Performance is evaluated using **F1-score, Confusion Matrix, and Classification Report**.
+`legal_topics_dict.py` maps the 279 SCDB issue codes to their text descriptions and is used by the 279-category prompt and RAG notebooks.
 
+## Tech stack
 
----
+Python, PyTorch, Hugging Face Transformers, PEFT (LoRA), Datasets, scikit-learn, Ollama (LLaMA 3), Sentence-Transformers, ChromaDB, textacy, spaCy, NLTK, Weights & Biases. Notebooks were run on Kaggle (some on Colab).
 
-### **Summary of classify-llama-prompt.ipynb**  
-This notebook integrates **Ollama** with `llama3` for **text classification and chat-based AI processing**. It starts by installing `ollama` and running the LLaMA3 model. The workflow includes querying LLaMA using the **Ollama API** for text-based interactions. Additionally, the **Supreme Court dataset** from `textacy` is loaded and processed into a `DataFrame`. The script leverages **asynchronous processing** using `AsyncClient` to handle multiple tasks efficiently. The notebook demonstrates querying LLaMA3 for text classification, making use of structured **prompt engineering** techniques. The dataset records are converted into a structured format, making it suitable for text-based ML applications.
+## How it works
 
-This notebook integrates **LLaMA 3 (Large Language Model Meta AI)** for **text classification and NLP-based inference** via **Ollama**.
+```mermaid
+flowchart LR
+    A[SCDB case text + issue labels<br/>15 or 279 classes] --> B[Preprocessing<br/>cleaning, stopwords, lemmatization]
+    B --> C1[Fine-tuning<br/>BERT / Legal-BERT / LLaMA 3<br/>full or LoRA]
+    B --> C2[Prompting<br/>LLaMA 3 via Ollama]
+    B --> C3[RAG<br/>MiniLM embeddings + ChromaDB<br/>similar cases added to prompt]
+    C1 --> D[Evaluation<br/>accuracy, precision, F1, confusion matrix]
+    C2 --> D
+    C3 --> D
+```
 
-1. **LLaMA 3 via Ollama API**  
-   - The model is downloaded and run using `ollama pull llama3`.  
-   - The **Ollama API** is used to send and receive responses.  
-   - It interacts with text data using structured **prompts**.
+- **Fine-tuning:** case text is tokenized and fed to a sequence classification head; the PEFT notebooks wrap the model with a LoRA adapter so only a small set of weights is trained. Runs are logged to W&B.
+- **Prompting:** each case is sent to a local LLaMA 3 model (Ollama, `AsyncClient` for concurrency) with the list of candidate categories, and the response is parsed into a label.
+- **RAG:** cases are embedded with `sentence-transformers/all-MiniLM-L6-v2` and stored in ChromaDB; the nearest labeled cases are retrieved and included as context in the LLaMA 3 prompt.
 
-2. **Classification Model via Prompting**  
-   - The function `classify_case_local()` sends a text query to the LLaMA model and retrieves a classification response.  
-   - The model processes Supreme Court case text and provides legal text classification based on contextual understanding.  
-   - The approach relies on **zero-shot or few-shot learning**, where the model classifies based on the provided prompt without explicit retraining.
+## Repository structure
 
-3. **Asynchronous Processing**  
-   - The `AsyncClient` is used to handle multiple requests efficiently for text classification.
+```
+.
+├── automodel-*.ipynb                     # full fine-tuning baselines
+├── peft*-*.ipynb                         # LoRA fine-tuning, 15 and 279 classes
+├── classify-llama-*.ipynb                # prompt-based LLaMA 3 classification
+├── rag-research*.ipynb                   # retrieval-augmented classification
+├── classification_diffusion_trial.ipynb  # exploratory diffusion classifier
+├── compare-results.ipynb                 # evaluation against ground truth
+├── legal_topics_dict.py                  # 279 SCDB issue codes -> descriptions
+└── requirements.txt
+```
 
+## Getting started
 
----
+The notebooks were written for Kaggle and read data from `/kaggle/input/...`. The simplest path is to open them on Kaggle with a GPU and attach the dataset below.
 
-### **Summary of RAG approach (still in planning)**  
+**Data:** [labels-web-of-law on Kaggle](https://www.kaggle.com/datasets/dhruvjoshi892/labels-web-of-law/) (`15_labels_data.csv`, `279_labels_data.csv`). Some notebooks also load the Supreme Court corpus directly through `textacy`.
 
-I though that we could create a RAG with various embedding models and experiment around with metadata/custom weights to get good retrivals to pass to the LLM classification. We can approach this from two methods:
+To run locally:
 
-1. **One shot the RAG model**
-   - We can classify single cases based on the retrieved docs from the RAG by applying a statisical model on it.
-   - This would be a direct extension of the approach in classify-llama-prompt.ipynb.
-   - It is expected to pass better context to the LLM.
+```bash
+git clone https://github.com/DJCodesStuff/Spring_2025_project.git
+cd Spring_2025_project
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+pip install jupyter
+jupyter notebook
+```
 
+Then:
 
-2. **Identify phrases/words which are related to the case classification:**
-   - We can ask the model's reasoning ability to highlight which phrases/words cause the classification using RAG.
-   - Take those phrases/words and apply techniques to identify the relation of the phrases/words and create a model on it.
-   - Then use this model to observe its accuracy. Sort of like a train-test scenario.
+- Download the Kaggle dataset and update the CSV paths in the notebook you want to run.
+- For the prompt and RAG notebooks, install [Ollama](https://ollama.com) and run `ollama pull llama3`.
+- For fine-tuning notebooks, log in to Weights & Biases (`wandb login`) and, for gated models such as LLaMA 3, set `HF_TOKEN`.
 
+Some notebooks install extra packages inline (for example `chromadb`, `sentence-transformers`, `nltk`, `contractions`) that are not in `requirements.txt`.
 
----
+## Results
 
-### **Summary of classification_diffusion_trial.ipynb**
+The best result reported in the paper was an **F1 of 0.624**, from prompt-based classification over the full **279 categories**. See the [paper](https://arxiv.org/abs/2512.13654) for the full comparison, which also covers DeepSeek and a log-smoothed loss.
 
-This notebook implements a diffusion-driven text classification model that combines denoising diffusion probabilistic models (DDPMs) with a standard classifier. The approach leverages a frozen BERT encoder for text embeddings, and adds trainable diffusion and classification heads to improve robustness — applied here to legal text classification.
+## Author
 
-🔑 Key Components
-
-- Diffusion Framework
-   Implements a DDPM schedule with 1000 timesteps
-   Uses sinusoidal time embeddings to encode diffusion steps
-   Adds controlled Gaussian noise to BERT sentence embeddings during training
-
-- Model Architecture
-   Frozen BERT Encoder → extracts 768-dimensional sentence embeddings
-   Denoiser MLP → predicts added noise and produces hidden features
-   Classifier Head → maps hidden features to label logits
-   Multi-task Learning → combines
-      Denoising loss (MSE)
-      Classification loss (CrossEntropy)
-
-- Training Process
-   Samples a random diffusion timestep for each batch
-   Corrupts embeddings with schedule-based noise
-   Optimizes both denoising and classification objectives jointly
-   Uses cosine LR scheduling with warmup
-
-- Inference & Evaluation
-   Runs embeddings through the model at a fixed mid-timestep (t=0.6) without extra noise
-   Evaluates using macro F1-score and accuracy
-   Includes a predict_texts() function for inference on raw inputs
-   
-✨ Why Diffusion for Classification?
-The innovation here is exploring whether diffusion-style denoising can act as a regularizer, forcing the classifier to learn more robust semantic representations. This is especially promising for legal text, where noise-tolerant embeddings may help capture subtle distinctions.
-
-
+**Dhruv Joshi** - [GitHub](https://github.com/DJCodesStuff) - [Portfolio](https://djcodesstuff.github.io/)
